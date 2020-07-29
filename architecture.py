@@ -67,9 +67,6 @@ def single_model(X):
     
 # ------------------------------------------- Block 4 ENDS ------------------------------------
     
-# ------------------------------------------- Block 5 BEGINS ------------------------------------
-# ------------------------------------------- Block 5 ENDS ------------------------------------
-
     tops = Flatten(name = 'flat')(tops)
     tops = Dropout(hyperparameters["dropout_prob"])(tops) # task_embeddings[task_id]
 #     tops = Dense(units = 64, name = 'dense', kernel_initializer=hyperparameters['initializer'], kernel_regularizer=regularizers.l2(hyperparameters['reg_lambda']))(tops)
@@ -108,7 +105,7 @@ def addConvBlock_joint(num_filters, kernel_size, hyperparameters, pool_size, top
   
     return tops
 
-    def architecture():
+def architecture():
     
     x,y,z = hyperparameters['height'], hyperparameters['width'], hyperparameters['channels']
     X = Input((x,y,z))
