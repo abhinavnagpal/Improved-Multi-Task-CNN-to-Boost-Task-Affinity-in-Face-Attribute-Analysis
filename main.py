@@ -96,7 +96,7 @@ date = datetime.datetime.now().strftime("%d - %b - %y - %H:%M:%S")
 filename = "model_joint_vgg" + date
 logdir = "logs/" + filename
 
-
+lr = ReduceLROnPlateau(monitor = 'val_loss', factor = 0.5, patience = 3, verbose = 1, mode = 'auto', min_lr = 0.00001)
 filepath = "saved_history/models/model_joint" 
 checkpoint = ModelCheckpoint(filepath, verbose=1, save_best_only=False, mode='max', period = 1)
 csv_logger = CSVLogger('saved_history/training_results_model_joint.csv', separator = ',', append=True)
@@ -112,9 +112,5 @@ preds = []
 #for i, d in enumerate([0, 1]):
 #    with tf.device("/gpu:%d" %d):
 #        with tf.name_scope("model_%d" %d) as scope:
-history = model.fit_generator(train_gen, 
-                              epochs=hyperparameters['epochs'], 
-                              validation_data = val_gen,
-callbacks = [CalculatingPredictions(preds, filepath), lr_scheduler, csv_logger,
-             tensorboard_callback], verbose = 1)
+history = model.fit_generator(train_gen,epochs=hyperparameters['epochs'], validation_data = val_gen,callbacks = [CalculatingPredictions(preds, filepath), lr, csv_logger,tensorboard_callback], verbose = 1)
 
