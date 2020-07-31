@@ -28,6 +28,12 @@ from keras.applications import densenet
 from keras_vggface import VGGFace
 from tensorflow.python.client import device_lib
 
+from hyperparameters import get_hyperparameters
+from load_dataset import preprocess
+from load_generator import load_generator
+from architecture import single_model
+from augmentation import apply_augmentation
+
 attr = pd.read_csv('./dataset/celeba/list_attr_celeba.csv')
 eval_partition = pd.read_csv('./dataset/celeba/list_eval_partition.csv')
 
@@ -42,7 +48,7 @@ def load_dataset(attribute_id, num_attributes, generator=True):
  
 attribute_id = 0
 frac = 0.4
-num = augment(attribute_id=attribute_id = 0, frac = frac)
+num = apply_augmentation(attribute_id=attribute_id, frac = frac)
 
 lis = os.listdir('./dataset/celeba-dataset/')[:]
 l=[]
