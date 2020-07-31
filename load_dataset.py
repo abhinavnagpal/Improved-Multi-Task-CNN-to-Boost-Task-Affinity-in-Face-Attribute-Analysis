@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-def preprocess(hyperparametersattr, eval_partition, attribute_id = None):
+def preprocess(hyperparameters, attr, eval_partition, attribute_id = None):
     
     if attribute_id==None:
         attr = attr[hyperparameters['targets']]
