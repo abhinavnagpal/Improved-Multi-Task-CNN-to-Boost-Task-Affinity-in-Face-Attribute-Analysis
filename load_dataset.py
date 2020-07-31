@@ -3,9 +3,6 @@ import pandas as pd
 
 def preprocess(hyperparameters):
     
-    attr = pd.read_csv('./dataset/celeba/list_attr_celeba.csv')
-    eval_partition = pd.read_csv('./dataset/celeba/list_eval_partition.csv')
-    
     attr = attr[hyperparameters['targets']]
     attr = attr.replace(-1, 0)
     attr = attr.set_index('image_id')
