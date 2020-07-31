@@ -68,6 +68,7 @@ print(device_name)
 
 attr = pd.read_csv('./dataset/celeba/list_attr_celeba.csv')
 eval_partition = pd.read_csv('./dataset/celeba/list_eval_partition.csv')
+hyperparameters = get_hyperparameters()
 
 train, val, test = preprocess(hyperparameters, attr, eval_partition)
 train_gen, val_gen, test_gen = load_generator(hyperparameters, train, val, test)
