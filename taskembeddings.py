@@ -16,7 +16,7 @@ from tensorflow.keras import regularizers
 from tensorflow.keras.utils import plot_model
 from tensorflow.keras.callbacks import ModelCheckpoint, LambdaCallback, CSVLogger, ReduceLROnPlateau, TensorBoard
 
-from hyperparameters import hyperparameters
+from hyperparameters import get_hyperparameters
 
 class taskEmbeddings(tf.keras.layers.Layer):
     def __init__(self, num_layers, **kwargs):
@@ -27,7 +27,8 @@ class taskEmbeddings(tf.keras.layers.Layer):
         super(taskEmbeddings, self).build(input_shape)
 
     def call(self, x):
-
+        
+        hyperparameters = get_hyperparameters()
         dynamic_weights = x[1]
         output_feature_maps = x[0]
 
