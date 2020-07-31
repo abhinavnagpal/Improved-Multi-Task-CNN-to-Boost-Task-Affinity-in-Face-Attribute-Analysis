@@ -75,7 +75,7 @@ X = Input((x,y,z))
     
 tops = single_model(X)  
 model = Model(inputs=X, outputs=[tops])
-model.load_weights('saved_history/models/vggface.h5', by_name=True)
+model.load_weights('saved_history/models/model_individual_kd.h5', by_name=True)
 
 opt = SGD(lr = hyperparameters['lr'])    
 model.compile(loss='binary_crossentropy',optimizer=opt, metrics = ['accuracy'])
