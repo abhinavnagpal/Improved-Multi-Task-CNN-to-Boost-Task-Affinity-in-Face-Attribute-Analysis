@@ -5,8 +5,9 @@ import tensorflow as tf
 import cv2
 import datetime
 import keras
-from sklearn.preprocessing import OneHotEncoder
+import os
 
+from sklearn.preprocessing import OneHotEncoder
 from tensorflow.keras import backend as K
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.layers import Dense, Softmax, Input, Flatten, Conv2D, Activation, BatchNormalization, MaxPooling2D, ReLU, Dropout, Concatenate, Dot, Multiply, Softmax, GlobalAveragePooling2D
@@ -17,22 +18,18 @@ from tensorflow.keras.utils import plot_model
 from tensorflow.keras.callbacks import ModelCheckpoint, LambdaCallback, CSVLogger, ReduceLROnPlateau, TensorBoard, LearningRateScheduler
 %matplotlib inline
 
-import warnings
-warnings.filterwarnings("ignore")
-
 import skimage as sk
 from skimage.transform import rescale, resize, rotate
 from skimage import util, exposure, io
 from numpy import fliplr, flipud
 
-import keras
 from keras.applications import densenet
 # # backend = set_keras_submodules(K.backend()),
 from keras_vggface import VGGFace
 from tensorflow.python.client import device_lib
 
-attr = pd.read_csv('/kaggle/input/celeba-dataset/list_attr_celeba.csv')
-eval_partition = pd.read_csv('/kaggle/input/celeba-dataset/list_eval_partition.csv')
+attr = pd.read_csv('./dataset/celeba/list_attr_celeba.csv')
+eval_partition = pd.read_csv('./dataset/celeba/list_eval_partition.csv')
 
 def load_dataset(attribute_id, num_attributes, generator=True):
     hyperparameters = get_hyperparameters(num_attributes)
@@ -43,11 +40,11 @@ def load_dataset(attribute_id, num_attributes, generator=True):
     
     return hyperparameters, train, val, test
  
+attribute_id = 0
 frac = 0.4
-num = augment(attribute_id=0, frac = frac)
+num = augment(attribute_id=attribute_id = 0, frac = frac)
 
-import os
-lis = os.listdir('/kaggle/working/celeba-dataset/img_align_celeba/img_align_celeba/')[:]
+lis = os.listdir('./dataset/celeba-dataset/')[:]
 l=[]
 for i in lis:
     if i[0]=='a':
@@ -68,17 +65,17 @@ for i in l:
 attr.reset_index()
 eval_partition.reset_index()
 
-hyperparameters, train, val, test, train_gen, val_gen, test_gen = load_dataset(attribute_id = 0, num_attributes=1)
+hyperparameters, train, val, test, train_gen, val_gen, test_gen = load_dataset(attribute_id = attribute_id, num_attributes=1)
 
 model_vgg = VGGFace(include_top = False, model='vgg16', input_shape=(218, 178, 3), pooling = 'max')
-model_vgg.save_weights('vggface.h5')
+model_vgg.save_weights('saved_history/models/vggface.h5')
 
 x,y,z = hyperparameters['height'], hyperparameters['width'], hyperparameters['channels']
 X = Input((x,y,z))
     
 tops = single_model(X)  
 model = Model(inputs=X, outputs=[tops])
-model.load_weights('/kaggle/working/vggface.h5', by_name=True)
+model.load_weights('saved_history/models/vggface.h5', by_name=True)
 
 opt = SGD(lr = hyperparameters['lr'])    
 model.compile(loss='binary_crossentropy',optimizer=opt, metrics = ['accuracy'])
@@ -87,14 +84,14 @@ print(device_lib.list_local_devices())
 
 date = datetime.datetime.now().strftime("%d - %b - %y - %H:%M:%S")
 
-filename = "vgg_model_individual_"
-logdir = "/kaggle/working/logs/" + filename
+filename = "vgg_model_individual_"+str(attribute_id = 0)
+logdir = "logs/" + filename
 
-filepath = "/kaggle/working/saved_history/models/vgg_model_individual_" 
+filepath = "saved_history/models/model_individual_"+str(attribute_id)
 checkpoint = ModelCheckpoint(filepath, verbose=1, save_best_only=False, mode='max', period = 1)
 lr = ReduceLROnPlateau(monitor = 'val_loss', factor = 0.5, patience = 3, verbose = 1, mode = 'auto', min_lr = 0.00001)
 
-csv_logger = CSVLogger('/kaggle/working/saved_history/vgg_model_individual_results.csv', separator = ',', append=True)
+csv_logger = CSVLogger('saved_history/training_results_model_individual_'+str(attribute_id)+ '.csv', separator = ',', append=True)
 tensorboard_callback = TensorBoard(log_dir = logdir)
 
 def scheduler(epoch, lr):
