@@ -1,0 +1,91 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import tensorflow as tf
+import cv2
+import datetime
+import keras
+import os
+from sklearn.preprocessing import OneHotEncoder
+
+from tensorflow.keras import backend as K
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.layers import Dense, Softmax, Input, Flatten, Conv2D, Activation, BatchNormalization, MaxPooling2D, ReLU, Dropout, Concatenate, Dot, Multiply, Softmax, GlobalAveragePooling2D
+from tensorflow.keras.optimizers import Adam, SGD
+from tensorflow.keras.models import Model
+from tensorflow.keras import regularizers
+from tensorflow.keras.utils import plot_model
+from tensorflow.keras.callbacks import ModelCheckpoint, LambdaCallback, CSVLogger, ReduceLROnPlateau, TensorBoard, LearningRateScheduler
+%matplotlib inline
+
+import skimage as sk
+from skimage.transform import rescale, resize, rotate
+from skimage import util, exposure, io
+from numpy import fliplr, flipud
+
+from hyperparamters import get_hyperparameters
+from load_dataset import preprocess
+from load_generator import load_generator
+
+def load_dataset(attribute_id, num_attributes, generator=True):
+    hyperparameters = get_hyperparameters(num_attributes)
+    train, val, test = preprocess(hyperparameters, attr, eval_partition,attribute_id)
+    if generator:
+        train_gen, val_gen, test_gen = load_generator(hyperparameters, train, val, test, attribute_id)
+        return hyperparameters, train, val, test, train_gen, val_gen, test_gen
+    
+    return hyperparameters, train, val, test
+
+def random_rotation(image_array):
+    random_degree = np.random.uniform(-25, 25)
+    return sk.transform.rotate(image_array, random_degree)
+
+def horizontal_flip(image_array):
+    return fliplr(image_array)
+
+def vertical_flip(image_array):
+    return flipud(image_array)
+
+def brightness_change(image_array):
+    random_level = np.random.uniform(0.75, 1.5)
+    return exposure.adjust_gamma(image_array, gamma=random_level)
+
+def apply_augmentation(attribute_id, frac=0.4):
+    
+    hyperparameters, train, val, test = load_dataset(attribute_id = 0, num_attributes=1, generator=False)  
+    k = list(train[hyperparameters['targets'][0+1]].value_counts())
+    x = ((train.shape[0]*frac - k[1])/(1-frac))
+    repeat = int(np.ceil(x/k[1]))
+    
+    train = train[train[hyperparameters['targets'][attribute_id+1]] == 1]
+    img_names = train.values[:,1]
+    l = len(img_names)
+    
+    available_transformations = {
+        'rotate': random_rotation,
+        'horizontal_flip': horizontal_flip, 
+        'vertical_flip': vertical_flip, 
+        'brightness_change':brightness_change
+    }
+    
+    num_generated_files = 0
+    for i in range(repeat):
+        for j in range(l):
+            # read image
+            img = plt.imread('.dataset/celeba-dataset/' + img_names[j])
+            
+            # num_transformations_to_apply = np.random.randint(1, len(available_transformations))
+            # num_transformations = 0
+            
+            transformed_image = None
+            
+            key = np.random.choice(list(available_transformations))
+            transformed_image = available_transformations[key](img)
+                
+            filename = 'augmented_image_'+str(attribute_id)+'_'+str(num_generated_files)+'_'+img_names[j]
+            new_file_path = '.dataset/celeba-dataset/' + filename
+            # print(new_file_path, key)
+            io.imsave(new_file_path, transformed_image)
+            num_generated_files += 1
+            
+    return num_generated_files
