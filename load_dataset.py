@@ -1,8 +1,14 @@
 import numpy as np
 import pandas as pd
 
-def preprocess(hyperparameters):
+def preprocess(hyperparametersattr, eval_partition, attribute_id = None):
     
+    if attribute_id==None:
+        attr = attr[hyperparameters['targets']]
+        print(1)
+    else:
+        attr = attr[['image_id', hyperparameters['targets'][attribute_id+1]]]
+
     attr = attr[hyperparameters['targets']]
     attr = attr.replace(-1, 0)
     attr = attr.set_index('image_id')
