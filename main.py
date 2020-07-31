@@ -27,7 +27,7 @@ from load_dataset import preprocess
 from load_generator import load_generator
 from architecture import single_model
 import crossstitch
-from hyperparameters import hyperparameters
+from hyperparameters import get_hyperparameters
 
 import keras
 from keras.applications import densenet
