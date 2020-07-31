@@ -15,7 +15,8 @@ from tensorflow.keras import backend as K
 from tensorflow.keras.utils import plot_model
 from matplotlib.patches import Rectangle
 import keras
-from hyperparameters import hyperparameters
+
+from hyperparameters import get_hyperparameters
 from crossstitch import CrossStitch
 from taskembeddings import taskEmbeddings
 
@@ -35,7 +36,7 @@ def addConvBlock_single(num_filters, kernel_size, hyperparameters, pool_size, to
   
     return tops
 
-def single_model(X):
+def single_model(X, hyperparameters):
 
 # ------------------------------------------- Block 1 BEGINS ------------------------------------
 
@@ -85,8 +86,6 @@ def single_model(X):
     tops = BatchNormalization()(tops)
 
     tops = Dense(units = 1, name='output',activation = 'sigmoid', kernel_initializer=hyperparameters['initializer'], kernel_regularizer=regularizers.l2(hyperparameters['reg_lambda']))(tops)
-    
-    
     return tops
 
 def addConvBlock_joint(num_filters, kernel_size, hyperparameters, pool_size, tops, stride, pad, pool_stride, isPool , i, j, k = 0):
@@ -105,7 +104,7 @@ def addConvBlock_joint(num_filters, kernel_size, hyperparameters, pool_size, top
   
     return tops
 
-def architecture():
+def architecture(hyperparameters):
     
     x,y,z = hyperparameters['height'], hyperparameters['width'], hyperparameters['channels']
     X = Input((x,y,z))
