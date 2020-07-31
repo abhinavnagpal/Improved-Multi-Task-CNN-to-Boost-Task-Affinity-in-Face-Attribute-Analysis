@@ -66,7 +66,10 @@ def main(hyperparameters):
 device_name = tf.test.gpu_device_name()
 print(device_name)
 
-train, val, test = preprocess(hyperparameters)
+attr = pd.read_csv('./dataset/celeba/list_attr_celeba.csv')
+eval_partition = pd.read_csv('./dataset/celeba/list_eval_partition.csv')
+
+train, val, test = preprocess(hyperparameters, attr, eval_partition)
 train_gen, val_gen, test_gen = load_generator(hyperparameters, train, val, test)
 
 model_vgg = VGGFace(include_top = False, model='vgg16', input_shape=(160, 128, 3), pooling = 'max')
