@@ -50,7 +50,7 @@ class CalculatingPredictions(tf.keras.callbacks.Callback):
 
 def main(hyperparameters):
     
-    X, tops = architecture()
+    X, tops = architecture(hyperparameters)
     
     # define
     model = Model(inputs=X, outputs=[tops])
@@ -81,7 +81,7 @@ X = Input((x,y,z))
 model_list=[]
 for task in range(hyperparameters['num_tasks']):
     # build model for the task
-    tops = single_model(X)  
+    tops = single_model(X, hyperparameters)  
     model = Model(inputs=X, outputs=[tops])
     model.load_weights('saved_history/models/vggface.h5', by_name=True)
     for i in model.layers:
